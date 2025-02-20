@@ -1,0 +1,32 @@
+# KLCiS Voucher System - Mikrotik Script [Store versions v1-v4]
+# Online and offline store supported
+# ADD YOUR VOUCHER STORE LINK MANUALLY
+
+/ip hotspot walled-garden ip add action=accept dst-host=payments.maya.ph comment="payments.maya.ph"
+/ip hotspot walled-garden ip add action=accept dst-host=assets.maya.ph comment="assets.maya.ph"
+/ip hotspot walled-garden ip add action=accept dst-host=assets.paymaya.com comment="assets.paymaya.com"
+/ip hotspot walled-garden ip add action=accept dst-host=api.mayabank.ph comment="api.mayabank.ph"
+/ip hotspot walled-garden ip add action=accept dst-host=api.paymaya.com comment="api.paymaya.com"
+/ip hotspot walled-garden ip add action=accept dst-host=api-bnpl.mayabank.ph comment="api-bnpl.mayabank.ph"
+/ip hotspot walled-garden ip add action=accept dst-host=connect.paymaya.com comment="connect.paymaya.com"
+/ip hotspot walled-garden ip add action=accept dst-host=payments.paymaya.com comment="payments.paymaya.com"
+/ip hotspot walled-garden ip add comment="klinternetservices.com" action=accept dst-host=klinternetservices.com
+/ip hotspot walled-garden ip add comment="s2.klinternetservices.com" action=accept dst-host=s2.klinternetservices.com
+/ip hotspot walled-garden ip add comment="payments.gcash.com" action=accept dst-host=payments.gcash.com
+/ip hotspot walled-garden ip add comment="ewallet-service-live.xendit.co" action=accept dst-host=ewallet-service-live.xendit.co
+/ip hotspot walled-garden ip add comment="checkout.xendit.co" action=accept dst-host=checkout.xendit.co
+/ip hotspot walled-garden ip add comment="checkout-ui-gateway.xendit.co" action=accept dst-host=checkout-ui-gateway.xendit.co
+/ip hotspot walled-garden ip add comment="assets.xendit.co" action=accept dst-host=assets.xendit.co
+/ip hotspot walled-garden ip add comment="api.xendit.co" action=accept dst-host=api.xendit.co
+/ip hotspot walled-garden ip add comment="customer-segment-api.mynt.xyz" action=accept dst-host=customer-segment-api.mynt.xyz
+/ip hotspot walled-garden ip add comment="ilog-sea-aliyun.aliplus.com" action=accept dst-host=ilog-sea-aliyun.aliplus.com
+/ip hotspot walled-garden ip add comment="imgs-ac.alipay.com" action=accept dst-host=imgs-ac.alipay.com
+/ip hotspot walled-garden ip add comment="mdap.paas.mynt.xyz" action=accept dst-host=mdap.paas.mynt.xyz
+/ip hotspot walled-garden ip add comment="mgs-gw.paas.mynt.xyz" action=accept dst-host=mgs-gw.paas.mynt.xyz
+/ip hotspot walled-garden ip add comment="login.mynt.xyz" action=accept dst-host=login.mynt.xyz
+/ip hotspot walled-garden ip add comment="mss.paas.mynt.xyz" action=accept dst-host=mss.paas.mynt.xyz
+/ip hotspot walled-garden ip add comment="irisk-sea.alipay.com" action=accept dst-host=irisk-sea.alipay.com
+/ip hotspot walled-garden ip add comment="iclientgw-sea.alipay.com" action=accept dst-host=iclientgw-sea.alipay.com
+/ip hotspot walled-garden ip add comment="m-gcash-com.s3.ap-southeast-1.amazonaws.com" action=accept dst-host=m-gcash-com.s3.ap-southeast-1.amazonaws.com
+/ip hotspot walled-garden ip add comment="mobilegw.alipay.com" action=accept dst-host=mobilegw.alipay.com
+/ip hotspot walled-garden ip add comment="klcis-gen.pages.dev" action=accept dst-host=klcis-gen.pages.dev
