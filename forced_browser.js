@@ -1,9 +1,4 @@
 /**
-* Made with love by KLCiS Voucher System
-* https://klinternetservices.com
-* https://facebook.com/mr.partingtime
-
-- v2 changelog
  * Enhanced Browser Detection Script
  * Features:
  * - Comprehensive mini-browser detection
@@ -11,22 +6,29 @@
  * - Responsive design for all devices
  * - Accessibility improvements
  * - Fallback mechanisms
- **/
-
+ * - Updated: 2025-05-23 (Improved modal styling and accessibility)
+ */
 document.addEventListener("DOMContentLoaded", function() {
+    // Configuration
     const config = {
-        popupDelay: 500, 
-        browserTimeouts: { 
+        popupDelay: 500,        // Delay before showing popup (ms)
+        browserTimeouts: {      // Timeouts for browser redirects (ms)
             primary: 500,
             secondary: 1000,
             fallback: 1500
         },
-        debug: false 
+        debug: false            // Enable for console logging
     };
 
+    /**
+     * Detects if the user is in a mini-browser/webview environment
+     * @returns {boolean} True if in mini-browser
+     */
     function isInMiniBrowser() {
         try {
             const ua = navigator.userAgent.toLowerCase();
+            
+            // Common webview and in-app browser identifiers
             const webviewPatterns = [
                 "wv",               // Android webview
                 "fb",               // Facebook
@@ -46,14 +48,18 @@ document.addEventListener("DOMContentLoaded", function() {
                 "viber"             // Viber
             ];
             
-
+            // Check for patterns indicating in-app browsers
             return webviewPatterns.some(pattern => ua.includes(pattern));
         } catch (error) {
             logError("Error detecting browser type", error);
-            return false;
+            return false; // Default to not showing popup on error
         }
     }
 
+    /**
+     * Gets device type for tailored messaging
+     * @returns {string} Device type identifier
+     */
     function getDeviceType() {
         try {
             const ua = navigator.userAgent.toLowerCase();
@@ -72,7 +78,9 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-
+    /**
+     * Attempts to open the current page in a full browser
+     */
     function openInBrowser() {
         try {
             const url = window.location.href;
@@ -81,24 +89,29 @@ document.addEventListener("DOMContentLoaded", function() {
             let opened = false;
             
             if (deviceType === "ios") {
-
+                // iOS handling - mostly requires manual action
                 showCopyMessage();
             } else if (deviceType === "android") {
-  
+                // Try multiple Android browsers with fallbacks
                 try {
+                    // Try Chrome first
                     window.location = `intent://${urlWithoutProtocol}#Intent;scheme=https;package=com.android.chrome;end;`;
                     
+                    // Try Firefox as fallback
                     setTimeout(() => {
                         if (!opened) {
                             window.location = `intent://${urlWithoutProtocol}#Intent;scheme=https;package=org.mozilla.firefox;end;`;
                         }
                     }, config.browserTimeouts.primary);
                     
+                    // Try Edge as second fallback
                     setTimeout(() => {
                         if (!opened) {
                             window.location = `intent://${urlWithoutProtocol}#Intent;scheme=https;package=com.microsoft.emmx;end;`;
                         }
                     }, config.browserTimeouts.secondary);
+                    
+                    // Last resort - attempt standard URL
                     setTimeout(() => {
                         if (!opened) {
                             window.location = url;
@@ -106,19 +119,24 @@ document.addEventListener("DOMContentLoaded", function() {
                     }, config.browserTimeouts.fallback);
                 } catch (err) {
                     logError("Error redirecting on Android", err);
+                    // Fallback to direct URL as last resort
                     window.location = url;
                 }
             } else {
+                // Generic handling for other platforms
                 try {
+                    // Try to open in new tab first
                     const newTab = window.open(url, '_blank');
                     
                     if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
+                        // If that fails, try direct navigation
                         window.location.href = url;
                     } else {
                         opened = true;
                     }
                 } catch (err) {
                     logError("Error opening new window", err);
+                    // Last resort
                     window.location.href = url;
                 }
             }
@@ -128,17 +146,22 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
+    /**
+     * Creates and shows the browser suggestion popup
+     */
     function createPopup() {
         try {
             const deviceType = getDeviceType();
             
+            // Create popup container with improved modal placement
             let popup = document.createElement("div");
             popup.id = "browserPopup";
             popup.setAttribute("role", "dialog");
             popup.setAttribute("aria-labelledby", "popupTitle");
             popup.setAttribute("aria-describedby", "popupDescription");
             
-            let baseStyles = `
+            // Improved modal placement CSS - ensure it's perfectly centered
+            popup.style = `
                 position: fixed;
                 top: 0;
                 left: 0;
@@ -149,12 +172,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 justify-content: center;
                 align-items: center;
                 flex-direction: column;
-                color: white;
-                text-align: center;
                 z-index: 9999;
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                box-sizing: border-box;
             `;
             
+            // Create popup content wrapper with improved styling
             let contentWrapper = document.createElement("div");
             contentWrapper.style = `
                 width: 90%;
@@ -165,30 +188,45 @@ document.addEventListener("DOMContentLoaded", function() {
                 box-shadow: 0 5px 20px rgba(0,0,0,0.3);
                 max-height: 90vh;
                 overflow-y: auto;
+                text-align: center;
+                border: 1px solid #444;
+                transform: translateY(-10px); /* Slight adjustment for visual balance */
             `;
             
+            // Create warning title with icon
             let title = document.createElement("h2");
             title.id = "popupTitle";
             title.style = `
                 margin-top: 0;
-                margin-bottom: 15px;
-                font-size: 1.4rem;
-                color: #fff;
+                margin-bottom: 20px;
+                font-size: 1.5rem;
+                color: #fbbf24; /* Amber warning color */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
             `;
-            title.innerText = "For the Best Experience";
+            // Add warning icon
+            title.innerHTML = `<span style="font-size: 1.6rem;">⚠️</span> For the Best Experience`;
             
+            // Create description with improved visibility
             let description = document.createElement("p");
             description.id = "popupDescription";
             description.style = `
                 margin-bottom: 20px;
-                line-height: 1.5;
-                font-size: 1rem;
+                line-height: 1.6;
+                font-size: 1.05rem;
+                color: #e5e7eb; /* Much brighter text for better visibility */
+                background: rgba(255, 255, 255, 0.05);
+                padding: 15px;
+                border-radius: 8px;
+                text-align: left;
             `;
             
             if (deviceType === "ios") {
                 description.innerHTML = `
                     This page may not work correctly in your current browser. For the best experience, please:
-                    <ol style="text-align: left; margin: 15px 0; padding-left: 20px;">
+                    <ol style="text-align: left; margin: 15px 0; padding-left: 20px; color: #e5e7eb;">
                         <li>Copy the link below</li>
                         <li>Open Safari</li>
                         <li>Paste and go to the link</li>
@@ -204,11 +242,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 `;
             }
             
+            // Create primary action button with improved styling
             let button = document.createElement("button");
             button.innerText = "Open in Browser";
             button.setAttribute("aria-label", "Open in full browser");
             button.style = `
-                padding: 12px 24px;
+                padding: 14px 24px;
                 background: #2563eb;
                 color: white;
                 font-size: 16px;
@@ -219,6 +258,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 transition: background 0.2s;
                 margin-bottom: 15px;
                 width: 100%;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             `;
             button.onmouseover = function() { this.style.background = "#1d4ed8"; };
             button.onmouseout = function() { this.style.background = "#2563eb"; };
@@ -231,23 +271,34 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             };
             
+            // Create copyable link with improved styling
             let copyLink = document.createElement("div");
             copyLink.style = `
                 margin: 15px 0;
-                padding: 10px;
+                padding: 12px;
                 background: #333;
-                color: #fff;
+                color: #e5e7eb;
                 border-radius: 8px;
                 word-break: break-all;
                 font-size: 14px;
                 cursor: pointer;
                 border: 1px solid #555;
+                text-align: left;
+                position: relative;
             `;
-            copyLink.innerHTML = `<span style="display: block; margin-bottom: 5px; font-size: 12px; color: #aaa;">Tap to copy:</span>${window.location.href}`;
+            copyLink.innerHTML = `
+                <span style="display: block; margin-bottom: 5px; font-size: 12px; color: #9ca3af;">
+                    Tap to copy:
+                </span>
+                ${window.location.href}
+                <span style="position: absolute; right: 10px; top: 10px; background: #2563eb; color: white; 
+                       padding: 3px 6px; border-radius: 4px; font-size: 11px;">COPY</span>
+            `;
             copyLink.setAttribute("aria-label", "Copy link to clipboard");
             copyLink.setAttribute("role", "button");
             copyLink.setAttribute("tabindex", "0");
             
+            // Handle copy functionality with fallbacks
             copyLink.onclick = function() {
                 try {
                     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -268,6 +319,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             };
             
+            // Make copyLink keyboard accessible
             copyLink.onkeydown = function(e) {
                 if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
@@ -275,14 +327,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             };
             
+            // Close button with enhanced styling
             let closeButton = document.createElement("button");
             closeButton.innerText = "Continue Anyway";
             closeButton.setAttribute("aria-label", "Dismiss notification and continue");
             closeButton.style = `
                 margin-top: 15px;
-                padding: 10px 20px;
-                background: transparent;
-                color: #aaa;
+                padding: 12px 20px;
+                background: rgba(255, 255, 255, 0.1);
+                color: #d1d5db;
                 font-size: 14px;
                 border: 1px solid #555;
                 border-radius: 8px;
@@ -291,12 +344,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 width: 100%;
             `;
             closeButton.onmouseover = function() { 
-                this.style.background = "#333";
+                this.style.background = "rgba(255, 255, 255, 0.2)";
                 this.style.color = "#fff";
             };
             closeButton.onmouseout = function() { 
-                this.style.background = "transparent";
-                this.style.color = "#aaa";
+                this.style.background = "rgba(255, 255, 255, 0.1)";
+                this.style.color = "#d1d5db";
             };
             closeButton.onclick = function() {
                 try {
@@ -312,6 +365,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             };
             
+            // Add status message area for feedback
             let statusMessage = document.createElement("div");
             statusMessage.id = "statusMessage";
             statusMessage.style = `
@@ -324,15 +378,17 @@ document.addEventListener("DOMContentLoaded", function() {
                 visibility: hidden;
             `;
             
+            // Legal text with improved visibility
             let legalText = document.createElement("p");
             legalText.style = `
                 margin-top: 20px;
                 font-size: 12px;
-                color: #888;
+                color: #9ca3af;
                 line-height: 1.4;
             `;
             legalText.innerHTML = "We recommend using a standard browser for full functionality and security features.";
-
+            
+            // Assemble popup
             contentWrapper.appendChild(title);
             contentWrapper.appendChild(description);
             contentWrapper.appendChild(button);
@@ -342,6 +398,7 @@ document.addEventListener("DOMContentLoaded", function() {
             contentWrapper.appendChild(legalText);
             popup.appendChild(contentWrapper);
             
+            // Add ESC key to close
             document.addEventListener("keydown", function(e) {
                 if (e.key === "Escape" && document.body.contains(popup)) {
                     try {
@@ -352,15 +409,21 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             });
             
+            // Add to page
             document.body.appendChild(popup);
+            
+            // Ensure the popup is properly focused for accessibility
             button.focus();
             
         } catch (error) {
             logError("Error creating popup", error);
+            // Don't show any popup if there was an error to prevent blocking the user
         }
     }
     
-
+    /**
+     * Shows a success message when link is copied
+     */
     function showCopySuccess() {
         try {
             const statusMessage = document.getElementById("statusMessage");
@@ -378,12 +441,15 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
     
+    /**
+     * Shows a copy instructions message for iOS
+     */
     function showCopyMessage() {
         try {
             const statusMessage = document.getElementById("statusMessage");
             if (statusMessage) {
                 statusMessage.innerHTML = "Please copy the link above and open it in Safari";
-                statusMessage.style.color = "#3b82f6";
+                statusMessage.style.color = "#3b82f6"; // Info blue
                 statusMessage.style.visibility = "visible";
                 
                 setTimeout(() => {
@@ -395,7 +461,10 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
     
-
+    /**
+     * Shows an error message in the popup
+     * @param {string} message - Error message to display
+     */
     function showErrorMessage(message) {
         try {
             const statusMessage = document.getElementById("statusMessage");
@@ -410,19 +479,21 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         } catch (error) {
             logError("Error showing error message", error);
-         
+            // Last resort - alert
             try {
                 alert(message || "An error occurred. Please try copying the URL manually.");
             } catch (e) {
-    
+                // Silent failure if even alert fails
             }
         }
     }
     
-
+    /**
+     * Fallback copy method for browsers without clipboard API
+     */
     function fallbackCopy() {
         try {
-
+            // Create temporary input
             const textArea = document.createElement("textarea");
             textArea.value = window.location.href;
             textArea.style.position = "fixed";
@@ -447,19 +518,28 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
     
+    /**
+     * Logs errors to console in debug mode
+     * @param {string} message - Error description
+     * @param {Error} error - Error object
+     */
     function logError(message, error) {
         if (config.debug) {
             console.error(`[Browser Detection]: ${message}`, error);
         }
     }
     
+    // Main execution
     try {
+        // Check if running in mini-browser
         if (isInMiniBrowser()) {
+            // Slight delay to ensure DOM is fully loaded
             setTimeout(() => {
                 createPopup();
             }, config.popupDelay);
         }
     } catch (error) {
         logError("Fatal error in browser detection", error);
+        // Don't block user even if script fails
     }
 });
